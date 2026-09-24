@@ -27,20 +27,6 @@ npm start
 
 The dashboard will be available at http://localhost:9615.
 
-### Run Tests
-
-```
-npm test
-```
-
-This will build the project by running the `build` script, start a webpack dev server instance and run tests afterwards.
-
-To run only tests without building the full project again:
-
-```
-npm run test-no-build
-```
-
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.

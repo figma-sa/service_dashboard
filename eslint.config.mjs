@@ -108,17 +108,6 @@ export default tsEslint.config(
     },
   },
   {
-    files: ['test/**/*.ts', 'setupJest.js'],
-    languageOptions: {
-      globals: {
-        ...globals.jest,
-      },
-    },
-    rules: {
-      'react-hooks/rules-of-hooks': 'off',
-    },
-  },
-  {
     files: ['src/**/*.{js,jsx,ts,tsx}'],
     rules: {
       '@typescript-eslint/no-use-before-define': 'warn',
