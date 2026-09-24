@@ -4,7 +4,6 @@
 import path from 'node:path';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
 import lodash from 'lodash';
 import examplesList from './examples-list.json' with { type: 'json' };
 import config from './scripts/config.js';
@@ -18,66 +17,6 @@ const addEntryIteration = (entries, example) => {
 };
 
 const entries = examplesList.reduce(addEntryIteration, {});
-
-const configs = [
-  {
-    entry: entries,
-    output: {
-      path: config.outputPath,
-    },
-  },
-  {
-    entry: {
-      'fake-server': './src/fake-server/index.ts',
-    },
-    optimization: {
-      splitChunks: {
-        cacheGroups: {
-          vendor: {
-            test: () => false,
-          },
-        },
-      },
-    },
-    output: {
-      libraryTarget: 'window',
-      library: 'FakeServer',
-      path: path.join(config.outputPath, 'libs'),
-    },
-    resolve: {
-      extensions: ['.ts'],
-    },
-    module: {
-      rules: [
-        {
-          test: /\.tsx?/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: ['@babel/preset-env', '@babel/preset-typescript'],
-            },
-          },
-        },
-      ],
-    },
-    plugins: [
-      new CopyWebpackPlugin({
-        patterns: [
-          {
-            from: '**/*',
-            to: path.join(config.outputPath, 'libs', 'ace'),
-            context: 'node_modules/ace-builds/src-min-noconflict/',
-          },
-          {
-            from: '*',
-            to: path.join(config.outputPath, 'resources'),
-            context: 'src/resources',
-          },
-        ],
-      }),
-    ],
-  },
-];
 
 const createWebpackConfig = (base, { includeDevServer }) => {
   const defaults = {
@@ -201,4 +140,14 @@ const createWebpackConfig = (base, { includeDevServer }) => {
   return lodash.mergeWith(defaults, base, mergeArrays);
 };
 
-export default configs.map((config, index) => createWebpackConfig(config, { includeDevServer: index === 0 }));
+export default [
+  createWebpackConfig(
+    {
+      entry: entries,
+      output: {
+        path: config.outputPath,
+      },
+    },
+    { includeDevServer: true },
+  ),
+];

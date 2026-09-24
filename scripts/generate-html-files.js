@@ -46,44 +46,21 @@ function getPageContent(pageName, { title }) {
     </header>
     ${frameworkUtils.initialMarkup}
 </div>
-<script src="./libs/fake-server.js"></script>
 ${frameworkUtils.getScripts(pageName)}
 </body>
 </html>
 `;
 }
 
-function getIndexContent() {
-  const links = examplesList
-    .map(example => `<li><a href="${applyTheme(example.path, 'html')}">${example.title}</a></li>`)
-    .join('\n');
-  return `<!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <title>Cloudscape Demos - index</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    </head>
-    <body>
-      <ul>${links}</ul>
-    </body>
-  </html>
-  `;
-}
-
-function generateIndexFile() {
-  const filePath = path.join(config.outputPath, 'index.html');
-  return writeFileAsync(filePath, getIndexContent());
-}
-
-function generateHtmlFile(page) {
+function generateHtmlFile(page, fileName) {
   const pageName = page.path.split('/').pop();
   const content = getPageContent(pageName, page);
-  const filePath = path.join(config.outputPath, applyTheme(pageName, 'html'));
+  const filePath = path.join(config.outputPath, applyTheme(fileName, 'html'));
   return writeFileAsync(filePath, content);
 }
 
 for (const page of examplesList) {
-  await generateHtmlFile(page);
-  await generateIndexFile();
+  const pageName = page.path.split('/').pop();
+  await generateHtmlFile(page, pageName);
+  await generateHtmlFile(page, 'index');
 }

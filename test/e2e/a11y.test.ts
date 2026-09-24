@@ -2,14 +2,11 @@
 // SPDX-License-Identifier: MIT-0
 import fs from 'fs';
 import * as Axe from 'axe-core';
-import createWrapper from '@cloudscape-design/components/test-utils/selectors';
 import { BasePageObject } from '@cloudscape-design/browser-test-tools/page-objects';
 import useBrowser from '@cloudscape-design/browser-test-tools/use-browser';
 import { allTestPages } from './common/all-test-pages';
 
 declare const axe: typeof Axe;
-
-const tableRowSelector = createWrapper().findTable().findRows().get(2).toSelector();
 
 function filterIgnored(results: Axe.Result[]) {
   return results.filter(result => {
@@ -54,26 +51,13 @@ describe('Checking examples accessibility', function () {
       useBrowser(async browser => {
         await browser.url(pagePath);
         const page = new BasePageObject(browser);
-        if (pagePath.includes('server-side-table')) {
-          // server-side-table needs extra time to load items before we can make assertions
-          await page.waitForVisible(tableRowSelector, true, 30000);
-        } else if (pagePath.match(/form.html$/)) {
-          // ace is loaded asynchronously
-          await page.waitForVisible(createWrapper().findCodeEditor().findEditor().toSelector(), true);
-        } else {
-          await page.waitForVisible('main', true);
-        }
+        await page.waitForVisible('main', true);
 
         // report if there are any occurrences of string "undefined" in HTML
         const undefinedContent = await browser.execute(findUndefinedNodes);
         expect(undefinedContent).toEqual([]);
 
         expect(await page.getElementsCount('[aria-label*=undefined]')).toEqual(0);
-
-        // HACK: Ace makes test to fail
-        await browser.execute(() => {
-          document.querySelector('.ace_text-layer')?.setAttribute('style', 'display: none');
-        });
 
         await browser.execute(fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8'));
         type AxeResult = { result: Axe.AxeResults } | { error: Error };
@@ -86,8 +70,7 @@ describe('Checking examples accessibility', function () {
             .run({
               // exclude cloudWatch dashboard iframes
               // exclude focus-lock guards, as it implements intended keyboard traps
-              // exclude Ace editor related elements, as the library does not implement a11y
-              exclude: [['iframe'], ['[data-focus-guard=true]'], ['[class^=ace_]']],
+              exclude: [['iframe'], ['[data-focus-guard=true]']],
             })
             .then(
               result => done({ result }),
