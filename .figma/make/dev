@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export NODE_ENV=development
+
+# The dev server serves the generated HTML shells from `lib` as static files,
+# so they have to exist before webpack-dev-server starts.
+mkdir -p lib
+node ./scripts/generate-html-files
+
+allowed_host="${FIGMA_PUBLIC_URL:-}"
+allowed_host="${allowed_host#*://}"
+allowed_host="${allowed_host%%/*}"
+allowed_host="${allowed_host%%:*}"
+
+set -- npx webpack serve --port "$PORT" --host 0.0.0.0
+if [ -n "$allowed_host" ]; then
+  set -- "$@" --allowed-hosts "$allowed_host"
+fi
+
+exec "$@"

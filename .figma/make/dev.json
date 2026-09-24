@@ -1,0 +1,4 @@
+{
+  "installOn": ["package.json", "package-lock.json"],
+  "restartOn": ["webpack.config.mjs", "scripts/**", "examples-list.json"]
+}
