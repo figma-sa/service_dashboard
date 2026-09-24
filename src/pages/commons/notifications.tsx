@@ -4,20 +4,11 @@ import React, { useId, useState } from 'react';
 
 import Flashbar, { FlashbarProps } from '@cloudscape-design/components/flashbar';
 
-import { useDisclaimerFlashbarItem } from './disclaimer-flashbar-item';
-
 function useNotifications(showSuccessNotification = false) {
   const successId = useId();
   const [successDismissed, dismissSuccess] = useState(false);
-  const [disclaimerDismissed, dismissDisclaimer] = useState(false);
-
-  const disclaimerItem = useDisclaimerFlashbarItem(() => dismissDisclaimer(true));
 
   const notifications: Array<FlashbarProps.MessageDefinition> = [];
-
-  if (disclaimerItem && !disclaimerDismissed) {
-    notifications.push(disclaimerItem);
-  }
 
   if (showSuccessNotification && !successDismissed) {
     notifications.push({

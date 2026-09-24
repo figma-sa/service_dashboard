@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Git hooks are not useful in the sandbox; skip the `prepare` lifecycle script.
+export HUSKY=0
+
+# The committed package-lock.json is post-processed by scripts/clean-package-lock.js,
+# which strips the @cloudscape-design entries, so `npm ci` refuses it as out of sync.
+exec npm install --no-audit --no-fund
